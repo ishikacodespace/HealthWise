@@ -1,11 +1,17 @@
-# Ignore compiled class files
+# Java class files
 *.class
 
-# Ignore IDE/project settings
+# IDE/project files
 .vscode/
 .idea/
 *.iml
 
-# Ignore OS files
+# OS files
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Node dependencies (if frontend exists)
+node_modules/
