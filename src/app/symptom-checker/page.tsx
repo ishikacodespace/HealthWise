@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { Stethoscope, Lightbulb, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import {
   getSymptomAnalysis,
