@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import {
   Card,
@@ -6,67 +8,134 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+/**
+ * Remote Unsplash images for each topic.
+ * Ensure images.unsplash.com is allowed in next.config.js images.remotePatterns.
+ */
+const PlaceHolderImages = [
+  {
+    id: 'awareness-diet',
+    imageUrl:
+      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1600&auto=format&fit=crop',
+    description:
+      'Colorful balanced plate with vegetables, protein, and whole grains on a rustic table',
+    imageHint:
+      'balanced diet, macronutrients, whole foods, portion control, healthy eating',
+  },
+  {
+    id: 'awareness-exercise',
+    imageUrl:
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600&auto=format&fit=crop',
+    description:
+      'Person tying running shoes before an outdoor workout at sunrise',
+    imageHint: 'daily exercise, cardio, running, movement, fitness routine',
+  },
+  {
+    id: 'awareness-mental-health',
+    imageUrl:
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1600&auto=format&fit=crop',
+    description: 'Calm person meditating on a mat with soft natural light',
+    imageHint:
+      'mindfulness, stress management, meditation, mental well-being',
+  },
+  {
+    id: 'awareness-sleep',
+    imageUrl:
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1600&auto=format&fit=crop',
+    description:
+      'Cozy bedroom with soft lighting and comfortable bedding symbolizing quality sleep',
+    imageHint:
+      'sleep hygiene, circadian rhythm, rest, recovery, bedtime routine',
+  },
+  {
+    id: 'awareness-hydration',
+    imageUrl:
+      'https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?q=80&w=1600&auto=format&fit=crop',
+    description:
+      'Glass water bottle with condensation and clear water on a table',
+    imageHint: 'hydration, drink water, electrolytes, daily intake',
+  },
+  {
+    id: 'awareness-labels',
+    imageUrl:
+      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1600&auto=format&fit=crop',
+    description:
+      'Healthy groceries and a nutrition label close-up for learning to read food labels',
+    imageHint:
+      'nutrition facts, ingredients list, sugar, fiber, serving size',
+  },
+];
 
 const awarenessTopics = [
   {
     title: 'Balanced Diet Essentials',
-    description: 'Learn how to build a balanced plate with the right mix of nutrients to fuel your body and mind. Discover the importance of whole foods and mindful eating.',
+    description:
+      'Learn how to build a balanced plate with the right mix of nutrients to fuel your body and mind. Discover the importance of whole foods and mindful eating.',
     imageId: 'awareness-diet',
   },
   {
     title: 'The Power of Daily Exercise',
-    description: 'Even 30 minutes of moderate activity per day can significantly improve your cardiovascular health, boost your mood, and increase your energy levels.',
+    description:
+      'Even 30 minutes of moderate activity per day can significantly improve your cardiovascular health, boost your mood, and increase your energy levels.',
     imageId: 'awareness-exercise',
   },
   {
     title: 'Nurturing Your Mental Health',
-    description: 'Explore techniques for managing stress, practicing mindfulness, and knowing when to seek professional help. Your mental well-being is a priority.',
+    description:
+      'Explore techniques for managing stress, practicing mindfulness, and knowing when to seek professional help. Your mental well-being is a priority.',
     imageId: 'awareness-mental-health',
   },
   {
     title: 'The Importance of Quality Sleep',
-    description: 'Understand the sleep cycle and discover tips for improving your sleep hygiene. Quality sleep is crucial for physical recovery and cognitive function.',
+    description:
+      'Understand the sleep cycle and discover tips for improving your sleep hygiene. Quality sleep is crucial for physical recovery and cognitive function.',
     imageId: 'awareness-sleep',
   },
   {
     title: 'Hydration for Health',
-    description: 'Discover why water is essential for your body and get tips on how to stay properly hydrated throughout the day.',
+    description:
+      'Discover why water is essential for your body and get tips on how to stay properly hydrated throughout the day.',
     imageId: 'awareness-hydration',
   },
   {
     title: 'Decoding Food Labels',
-    description: 'Learn how to read and understand food labels to make healthier choices at the grocery store.',
+    description:
+      'Learn how to read and understand food labels to make healthier choices at the grocery store.',
     imageId: 'awareness-labels',
-  }
+  },
 ];
 
 const videoTopics = [
-    {
-        title: "Understanding Vaccines",
-        description: "An animated explainer on how vaccines work to protect you and your community.",
-        videoId: "o_XVt5rdpFY",
-    },
-    {
-        title: "5-Minute Mindfulness Meditation",
-        description: "A guided meditation session to help you reduce stress and find your center.",
-        videoId: "inpok4MKVLM",
-    },
-    {
-        title: "Healthy Cooking for Beginners",
-        description: "Learn to cook a simple, nutritious, and delicious meal in under 15 minutes.",
-        videoId: "fJb_O_5Xv8o",
-    },
-    {
-        title: "The Benefits of a Morning Walk",
-        description: "Explore the physical and mental health benefits of starting your day with a walk.",
-        videoId: "y_p_0_ML-sQ",
-    }
-]
+  {
+    title: 'Understanding Vaccines',
+    description:
+      'An animated explainer on how vaccines work to protect you and your community.',
+    videoId: 'o_XVt5rdpFY',
+  },
+  {
+    title: '5-Minute Mindfulness Meditation',
+    description:
+      'A guided meditation session to help you reduce stress and find your center.',
+    videoId: 'inpok4MKVLM',
+  },
+  {
+    title: 'Healthy Cooking for Beginners',
+    description:
+      'Learn simple, healthy cooking tips and a framework to get started today.',
+    videoId: 'hrZfqmF3ero', // fixed working video
+  },
+  {
+    title: 'The Benefits of a Morning Walk',
+    description:
+      'Discover evidence-based benefits of starting your day with a walk.',
+    videoId: 'jBHa1nsaJFM', // fixed working video
+  },
+];
 
 export default function AwarenessPage() {
-  const topicsWithImages = awarenessTopics.map(topic => {
-    const image = PlaceHolderImages.find(img => img.id === topic.imageId);
+  const topicsWithImages = awarenessTopics.map((topic) => {
+    const image = PlaceHolderImages.find((img) => img.id === topic.imageId);
     return { ...topic, image };
   });
 
@@ -83,30 +152,38 @@ export default function AwarenessPage() {
 
       <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {topicsWithImages.map((topic) => (
-           <div key={topic.title} className="flip-card rounded-lg overflow-hidden h-[300px]">
+          <div
+            key={topic.title}
+            className="flip-card rounded-lg overflow-hidden h-[300px]"
+          >
             <div className="flip-card-inner relative w-full h-full text-center">
               <div className="flip-card-front w-full h-full">
-                 <Card className="flex flex-col h-full shadow-lg">
-                    <CardHeader className="flex-shrink-0">
-                      <CardTitle className="font-headline">{topic.title}</CardTitle>
-                    </CardHeader>
-                    {topic.image && (
-                      <CardContent className="flex-grow relative p-0">
-                        <Image
-                          src={topic.image.imageUrl}
-                          alt={topic.image.description}
-                          fill
-                          className="object-cover"
-                          data-ai-hint={topic.image.imageHint}
-                        />
-                      </CardContent>
-                    )}
-                  </Card>
+                <Card className="flex flex-col h-full shadow-lg">
+                  <CardHeader className="flex-shrink-0">
+                    <CardTitle className="font-headline">
+                      {topic.title}
+                    </CardTitle>
+                  </CardHeader>
+                  {topic.image && (
+                    <CardContent className="flex-grow relative p-0">
+                      <Image
+                        src={topic.image.imageUrl}
+                        alt={topic.image.description}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        data-ai-hint={topic.image.imageHint}
+                      />
+                    </CardContent>
+                  )}
+                </Card>
               </div>
               <div className="flip-card-back w-full h-full absolute top-0 left-0">
                 <Card className="flex flex-col h-full bg-secondary shadow-lg">
                   <CardContent className="flex-grow flex items-center justify-center p-6">
-                    <CardDescription className="text-secondary-foreground">{topic.description}</CardDescription>
+                    <CardDescription className="text-secondary-foreground">
+                      {topic.description}
+                    </CardDescription>
                   </CardContent>
                 </Card>
               </div>
@@ -116,34 +193,37 @@ export default function AwarenessPage() {
       </div>
 
       <div className="mt-24">
-         <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold font-headline tracking-tight text-foreground sm:text-4xl">
-                Health in Motion
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-                Watch and learn with these short, informative videos.
-            </p>
+        <div className="text-center max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold font-headline tracking-tight text-foreground sm:text-4xl">
+            Health in Motion
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Watch and learn with these short, informative videos.
+          </p>
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {videoTopics.map((video) => (
-                <Card key={video.title} className="overflow-hidden shadow-lg card-glow">
-                    <div className="aspect-video">
-                        <iframe
-                            className="w-full h-full"
-                            src={`https://www.youtube.com/embed/${video.videoId}`}
-                            title={video.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-xl">{video.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <CardDescription>{video.description}</CardDescription>
-                    </CardContent>
-                </Card>
-            ))}
+          {videoTopics.map((video) => (
+            <Card key={video.title} className="overflow-hidden shadow-lg card-glow">
+              <div className="aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${video.videoId}`}
+                  title={video.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <CardHeader>
+                <CardTitle className="font-headline text-xl">
+                  {video.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>{video.description}</CardDescription>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
