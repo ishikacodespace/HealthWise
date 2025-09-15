@@ -9,7 +9,6 @@ import type { z } from 'zod';
 import { Loader2, UserPlus } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
-import { registerUser } from '@/actions/auth';
 import { RegisterSchema } from '@/lib/definitions';
 import { Button } from '@/components/ui/button';
 import {
