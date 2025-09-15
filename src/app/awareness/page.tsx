@@ -87,11 +87,11 @@ export default function AwarenessPage() {
             <div className="flip-card-inner relative w-full h-full text-center">
               <div className="flip-card-front w-full h-full">
                  <Card className="flex flex-col h-full shadow-lg">
-                    <CardHeader className="flex-grow">
+                    <CardHeader className="flex-grow-0">
                       <CardTitle className="font-headline">{topic.title}</CardTitle>
                     </CardHeader>
                     {topic.image && (
-                      <div className="relative aspect-video w-full">
+                      <CardContent className="flex-grow relative">
                         <Image
                           src={topic.image.imageUrl}
                           alt={topic.image.description}
@@ -99,7 +99,7 @@ export default function AwarenessPage() {
                           className="object-cover"
                           data-ai-hint={topic.image.imageHint}
                         />
-                      </div>
+                      </CardContent>
                     )}
                   </Card>
               </div>
