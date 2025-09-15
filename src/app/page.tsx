@@ -63,7 +63,7 @@ export default function Home() {
                 src={heroImage.imageUrl}
                 alt={heroImage.description}
                 fill
-                className="absolute inset-0 w-full h-full object-cover -z-10 opacity-10"
+                className="absolute inset-0 w-full h-full object-cover -z-10 opacity-5"
                 data-ai-hint={heroImage.imageHint}
                 priority
             />
@@ -81,8 +81,8 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <Card key={feature.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl bg-card/50 backdrop-blur-sm">
+            {features.map((feature, index) => (
+              <Card key={feature.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 card-glow even:hover:rotate-1 odd:hover:-rotate-1 bg-card/50 backdrop-blur-sm">
                 {feature.image && (
                   <div className="aspect-w-3 aspect-h-2">
                      <Image

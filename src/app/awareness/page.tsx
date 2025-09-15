@@ -45,7 +45,7 @@ export default function AwarenessPage() {
 
       <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {awarenessTopics.map((topic) => (
-          <Card key={topic.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+          <Card key={topic.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:-rotate-1 card-glow">
             {topic.image && (
               <div className="aspect-w-16 aspect-h-9">
                 <Image
