@@ -134,9 +134,9 @@ export default function SymptomCheckerPage() {
                         </div>
                     ) : analysis ? (
                         <div className="space-y-6">
-                            <Alert>
-                                <AlertTriangle className="h-4 w-4" />
-                                <AlertTitle>Disclaimer</AlertTitle>
+                            <Alert variant="destructive" className="bg-accent/20 border-accent text-accent-foreground">
+                                <AlertTriangle className="h-4 w-4 text-accent" />
+                                <AlertTitle className="text-accent-foreground">Disclaimer</AlertTitle>
                                 <AlertDescription>
                                 This AI-powered analysis is for informational purposes only and is not a medical diagnosis. Consult a healthcare professional for accurate advice.
                                 </AlertDescription>
