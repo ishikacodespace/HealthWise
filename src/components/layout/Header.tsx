@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HeartPulse, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { HeartPulse, Menu, Moon, Sun, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +11,9 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useTheme } from 'next-themes';
+import { useIsMobile } from '@/hooks/use-mobile';
+import BottomNav from './BottomNav';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -21,6 +24,19 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
+   const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  if (isMobile) {
+    return <BottomNav navLinks={navLinks} />;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -48,55 +64,18 @@ export default function Header() {
           ))}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
+           {mounted && (
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </Button>
+          )}
           <Button variant="outline" size="sm" asChild>
             <Link href="/login">Login</Link>
           </Button>
           <Button size="sm" asChild>
             <Link href="/register">Register</Link>
           </Button>
-        </div>
-        <div className="md:hidden">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full max-w-xs">
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between border-b pb-4">
-                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <HeartPulse className="h-7 w-7 text-primary" />
-                    <span className="text-lg font-bold font-headline">HealthWise</span>
-                  </Link>
-                </div>
-                <nav className="flex flex-col gap-4 mt-6">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        'text-lg font-medium transition-colors hover:text-primary',
-                        pathname === link.href ? 'text-primary' : 'text-foreground'
-                      )}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-                <div className="mt-auto flex flex-col gap-2 pt-6">
-                  <Button variant="outline" asChild onClick={() => setIsMobileMenuOpen(false)}>
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild onClick={() => setIsMobileMenuOpen(false)}>
-                    <Link href="/register">Register</Link>
-                  </Button>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>

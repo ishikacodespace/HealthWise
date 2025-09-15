@@ -45,26 +45,36 @@ export default function AwarenessPage() {
 
       <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {awarenessTopics.map((topic) => (
-          <Card key={topic.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:-rotate-1 card-glow">
-            {topic.image && (
-              <div className="aspect-w-16 aspect-h-9">
-                <Image
-                  src={topic.image.imageUrl}
-                  alt={topic.image.description}
-                  width={600}
-                  height={400}
-                  className="object-cover w-full h-full"
-                  data-ai-hint={topic.image.imageHint}
-                />
+           <div key={topic.title} className="flip-card rounded-lg overflow-hidden">
+            <div className="flip-card-inner relative w-full h-full text-center">
+              <div className="flip-card-front w-full h-full">
+                 <Card className="flex flex-col h-full shadow-lg">
+                    {topic.image && (
+                      <div className="relative aspect-w-16 aspect-h-9 w-full">
+                        <Image
+                          src={topic.image.imageUrl}
+                          alt={topic.image.description}
+                          width={600}
+                          height={400}
+                          className="object-cover w-full h-full"
+                          data-ai-hint={topic.image.imageHint}
+                        />
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="font-headline">{topic.title}</CardTitle>
+                    </CardHeader>
+                  </Card>
               </div>
-            )}
-            <CardHeader>
-              <CardTitle className="font-headline">{topic.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <CardDescription>{topic.description}</CardDescription>
-            </CardContent>
-          </Card>
+              <div className="flip-card-back w-full h-full">
+                <Card className="flex flex-col h-full bg-secondary shadow-lg">
+                  <CardContent className="flex-grow flex items-center justify-center p-6">
+                    <CardDescription className="text-secondary-foreground">{topic.description}</CardDescription>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>

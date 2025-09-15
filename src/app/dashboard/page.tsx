@@ -13,10 +13,19 @@ import {
   Loader2,
   List,
   AreaChart,
+  Flame,
+  Snowflake,
+  BadgeCent,
+  TrendingUp,
+  Award,
+  Zap,
+  Quote,
 } from 'lucide-react';
 import {
   Area,
   AreaChart as RechartsAreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -27,6 +36,17 @@ import {
   getPersonalizedHealthTips,
   type PersonalizedHealthTipsInput,
 } from '@/ai/flows/personalized-health-tips';
+import {
+    getBpStatus,
+    getTempStatus,
+    getBmiStatus,
+    calculateBmi,
+    getHealthScore,
+    wellnessQuotes,
+    type BpStatus,
+    type TempStatus,
+    type BmiStatus,
+} from '@/lib/health-utils';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -38,7 +58,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { HealthDataSchema, type HealthEntry } from '@/lib/definitions';
 import {
   Table,
@@ -57,7 +77,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
+import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 const chartConfig = {
   heartRate: {
@@ -70,11 +91,38 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const getStatusColor = (status: BpStatus | TempStatus | BmiStatus) => {
+    switch (status) {
+        case 'Normal': return 'text-green-500';
+        case 'Elevated':
+        case 'Low':
+        case 'Overweight':
+        case 'Underweight':
+            return 'text-yellow-500';
+        case 'High':
+        case 'Hypertensive Crisis':
+        case 'Obese':
+            return 'text-red-500';
+        default: return 'text-muted-foreground';
+    }
+}
+
 export default function DashboardPage() {
   const [healthData, setHealthData] = React.useState<HealthEntry[]>([]);
   const [personalizedTips, setPersonalizedTips] = React.useState<string[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [quote, setQuote] = React.useState('');
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    // Pick a random quote on component mount
+    setQuote(wellnessQuotes[Math.floor(Math.random() * wellnessQuotes.length)]);
+    // Load data from localStorage
+    const savedData = localStorage.getItem('healthData');
+    if (savedData) {
+      setHealthData(JSON.parse(savedData));
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof HealthDataSchema>>({
     resolver: zodResolver(HealthDataSchema),
@@ -82,24 +130,51 @@ export default function DashboardPage() {
       bloodPressure: '120/80',
       heartRate: '70',
       bodyTemperature: '98.6',
-      bmi: '22',
+      height: '175',
+      weight: '70'
     },
   });
+
+  const watchHeight = form.watch('height');
+  const watchWeight = form.watch('weight');
+
+  React.useEffect(() => {
+    const height = parseFloat(watchHeight);
+    const weight = parseFloat(watchWeight);
+    if (height > 0 && weight > 0) {
+      const bmi = calculateBmi(height, weight);
+      form.setValue('bmi', String(bmi));
+    }
+  }, [watchHeight, watchWeight, form]);
 
   async function onSubmit(values: z.infer<typeof HealthDataSchema>) {
     setIsLoading(true);
     setPersonalizedTips([]);
+
+    const bmi = calculateBmi(Number(values.height), Number(values.weight));
 
     const newEntry: HealthEntry = {
       id: Date.now(),
       bloodPressure: values.bloodPressure,
       heartRate: Number(values.heartRate),
       bodyTemperature: Number(values.bodyTemperature),
-      bmi: Number(values.bmi),
+      height: Number(values.height),
+      weight: Number(values.weight),
+      bmi: bmi,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     };
 
-    setHealthData((prev) => [...prev, newEntry]);
+    const updatedHealthData = [...healthData, newEntry];
+    setHealthData(updatedHealthData);
+    localStorage.setItem('healthData', JSON.stringify(updatedHealthData));
+
+
+    if (updatedHealthData.length > 0 && updatedHealthData.length % 3 === 0) {
+      toast({
+        title: 'Way to go! 🎉',
+        description: `You've logged your health ${updatedHealthData.length} times. Keep up the great work!`,
+      });
+    }
 
     const aiInput: PersonalizedHealthTipsInput = {
       bloodPressure: newEntry.bloodPressure,
@@ -123,9 +198,16 @@ export default function DashboardPage() {
     }
   }
 
+  const latestEntry = healthData.length > 0 ? healthData[healthData.length - 1] : null;
+  const bpStatus = latestEntry ? getBpStatus(latestEntry.bloodPressure) : null;
+  const tempStatus = latestEntry ? getTempStatus(latestEntry.bodyTemperature) : null;
+  const bmiStatus = latestEntry ? getBmiStatus(latestEntry.bmi) : null;
+  const healthScore = latestEntry && bpStatus && bmiStatus ? getHealthScore(bpStatus, bmiStatus, latestEntry.heartRate) : null;
+
+
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
-      <div className="text-center max-w-3xl mx-auto mb-12">
+      <div className="text-center max-w-3xl mx-auto mb-8">
         <h1 className="text-4xl font-bold font-headline tracking-tight text-foreground sm:text-5xl">
           Your Health Dashboard
         </h1>
@@ -133,25 +215,87 @@ export default function DashboardPage() {
           Enter your latest health metrics to track your progress and get personalized insights.
         </p>
       </div>
+      
+       {quote && (
+        <Card className="mb-8 bg-accent/20 border-accent/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <Quote className="h-6 w-6 text-accent" />
+              <p className="text-accent-foreground italic">"{quote}"</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      <div className="grid gap-12 lg:grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+        <Card className={cn("border-l-4", bpStatus === "Normal" ? "border-green-500": bpStatus === "Elevated" ? "border-yellow-500" : "border-red-500")}>
+            <CardHeader>
+                <CardTitle className='flex items-center justify-between text-lg'>
+                    Blood Pressure
+                    <Stethoscope className="w-5 h-5 text-muted-foreground" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-2xl font-bold">{latestEntry?.bloodPressure || 'N/A'}</p>
+                <p className={cn("text-sm font-medium", getStatusColor(bpStatus || 'Invalid'))}>{bpStatus}</p>
+            </CardContent>
+        </Card>
+        <Card className={cn("border-l-4", tempStatus === "Normal" ? "border-green-500": "border-yellow-500")}>
+            <CardHeader>
+                <CardTitle className='flex items-center justify-between text-lg'>
+                    Temperature
+                     <Thermometer className="w-5 h-5 text-muted-foreground" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-2xl font-bold">{latestEntry?.bodyTemperature ? `${latestEntry.bodyTemperature}°F` : 'N/A'}</p>
+                <p className={cn("text-sm font-medium", getStatusColor(tempStatus || 'Normal'))}>{tempStatus}</p>
+            </CardContent>
+        </Card>
+        <Card className={cn("border-l-4", bmiStatus === "Normal" ? "border-green-500": (bmiStatus === 'Overweight' || bmiStatus === 'Underweight') ? "border-yellow-500" : "border-red-500")}>
+            <CardHeader>
+                <CardTitle className='flex items-center justify-between text-lg'>
+                    BMI
+                    <Scaling className="w-5 h-5 text-muted-foreground" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-2xl font-bold">{latestEntry?.bmi || 'N/A'}</p>
+                <p className={cn("text-sm font-medium", getStatusColor(bmiStatus || 'Normal'))}>{bmiStatus}</p>
+            </CardContent>
+        </Card>
+        <Card className={cn("border-l-4", latestEntry && latestEntry.heartRate > 60 && latestEntry.heartRate < 100 ? "border-green-500" : "border-yellow-500")}>
+            <CardHeader>
+                <CardTitle className='flex items-center justify-between text-lg'>
+                    Heart Rate
+                    <HeartPulse className="w-5 h-5 text-muted-foreground" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-2xl font-bold">{latestEntry?.heartRate || 'N/A'} <span className='text-sm text-muted-foreground'>BPM</span></p>
+                <p className="text-sm font-medium text-muted-foreground">Resting</p>
+            </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <Card className="sticky top-24">
+          <Card className="sticky top-24 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-headline">
-                <HeartPulse />
+                <Zap />
                 Log Your Vitals
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="bloodPressure"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Stethoscope className="mr-2 h-4 w-4" />Blood Pressure</FormLabel>
+                        <FormLabel className="flex items-center text-sm"><Stethoscope className="mr-2 h-4 w-4" />Blood Pressure</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., 120/80" {...field} />
                         </FormControl>
@@ -164,7 +308,7 @@ export default function DashboardPage() {
                     name="heartRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><HeartPulse className="mr-2 h-4 w-4" />Heart Rate (BPM)</FormLabel>
+                        <FormLabel className="flex items-center text-sm"><HeartPulse className="mr-2 h-4 w-4" />Heart Rate (BPM)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="e.g., 70" {...field} />
                         </FormControl>
@@ -177,7 +321,7 @@ export default function DashboardPage() {
                     name="bodyTemperature"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Thermometer className="mr-2 h-4 w-4" />Body Temperature (°F)</FormLabel>
+                        <FormLabel className="flex items-center text-sm"><Thermometer className="mr-2 h-4 w-4" />Body Temperature (°F)</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.1" placeholder="e.g., 98.6" {...field} />
                         </FormControl>
@@ -185,14 +329,42 @@ export default function DashboardPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="height"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center text-sm"><Scaling className="mr-2 h-4 w-4" />Height (cm)</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="e.g., 175" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center text-sm"><Scaling className="mr-2 h-4 w-4" />Weight (kg)</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="e.g., 70" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                   <FormField
                     control={form.control}
                     name="bmi"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center"><Scaling className="mr-2 h-4 w-4" />Body Mass Index (BMI)</FormLabel>
+                        <FormLabel className="flex items-center text-sm"><BadgeCent className="mr-2 h-4 w-4" />Calculated BMI</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.1" placeholder="e.g., 22.5" {...field} />
+                          <Input type="number" step="0.1" disabled {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -209,11 +381,38 @@ export default function DashboardPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-8">
-            <Card>
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline">
+                        <Award />
+                        Your Health Score
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {healthScore !== null ? (
+                        <div>
+                            <div className='flex items-baseline gap-2'>
+                                <p className="text-4xl font-bold text-primary">{healthScore}</p>
+                                <p className='text-xl text-muted-foreground'>/ 100</p>
+                            </div>
+                            <Progress value={healthScore} className="mt-2 h-2" />
+                            <p className="text-sm text-muted-foreground mt-2">
+                               {healthScore > 85 ? "Excellent! Keep up the great work." : healthScore > 70 ? "Good job! A few small changes can make a big difference." : "Let's work on improving your numbers. Small steps lead to big results."}
+                            </p>
+                        </div>
+                    ) : (
+                         <p className="text-muted-foreground text-center py-4">
+                            Log your vitals to calculate your health score.
+                        </p>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline">
                         <Lightbulb />
-                        Your Personalized Health Tips
+                        AI Personalized Health Tips
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -239,9 +438,9 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle className="font-headline">Health Trend</CardTitle>
+                    <CardTitle className="font-headline flex items-center gap-2"><TrendingUp/>Health Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {healthData.length > 0 ? (
@@ -250,16 +449,17 @@ export default function DashboardPage() {
                                 <TabsTrigger value="chart"><AreaChart className="mr-2 h-4 w-4" />Chart</TabsTrigger>
                                 <TabsTrigger value="table"><List className="mr-2 h-4 w-4" />Table</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="chart" className="pt-4">
+                             <TabsContent value="chart" className="pt-4">
+                                <p className="text-sm text-muted-foreground mb-4">Heart Rate (blue) and BMI (orange) over time.</p>
                                 <ChartContainer config={chartConfig} className="aspect-video h-[250px] w-full">
-                                    <RechartsAreaChart data={healthData} margin={{ left: 12, right: 12 }}>
+                                    <RechartsAreaChart data={healthData} margin={{ left: -20, right: 12 }}>
                                         <CartesianGrid vertical={false} />
-                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
                                         <YAxis yAxisId="left" hide />
                                         <YAxis yAxisId="right" orientation="right" hide />
-                                        <Tooltip content={<ChartTooltipContent />} />
-                                        <Area yAxisId="left" dataKey="heartRate" type="monotone" fill="var(--color-heartRate)" fillOpacity={0.4} stroke="var(--color-heartRate)" />
-                                        <Area yAxisId="right" dataKey="bmi" type="monotone" fill="var(--color-bmi)" fillOpacity={0.4} stroke="var(--color-bmi)" />
+                                        <Tooltip content={<ChartTooltipContent indicator='dot'/>} />
+                                        <Area yAxisId="left" dataKey="heartRate" type="monotone" fill="var(--color-heartRate)" fillOpacity={0.4} stroke="var(--color-heartRate)" name="Heart Rate" />
+                                        <Area yAxisId="right" dataKey="bmi" type="monotone" fill="var(--color-bmi)" fillOpacity={0.4} stroke="var(--color-bmi)" name="BMI"/>
                                     </RechartsAreaChart>
                                 </ChartContainer>
                             </TabsContent>

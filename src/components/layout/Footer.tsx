@@ -3,7 +3,7 @@ import { HeartPulse, Github, Twitter, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-card text-card-foreground border-t">
+    <footer className="bg-muted text-muted-foreground mt-auto">
       <div className="container mx-auto px-4 py-8 md:px-6">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col items-start">
@@ -18,7 +18,7 @@ export default function Footer() {
             </p>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 font-headline">Quick Links</h4>
+            <h4 className="font-semibold mb-4 font-headline text-foreground">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">Home</Link></li>
               <li><Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary transition-colors">Dashboard</Link></li>
@@ -27,14 +27,14 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-             <h4 className="font-semibold mb-4 font-headline">Contact Us</h4>
+             <h4 className="font-semibold mb-4 font-headline text-foreground">Contact Us</h4>
              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>contact@healthwise.community</li>
                 <li>123 Health St, Wellness City</li>
              </ul>
           </div>
           <div>
-             <h4 className="font-semibold mb-4 font-headline">Follow Us</h4>
+             <h4 className="font-semibold mb-4 font-headline text-foreground">Follow Us</h4>
              <div className="flex items-center space-x-4">
                 <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github className="h-5 w-5" /></Link>
                 <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter className="h-5 w-5" /></Link>

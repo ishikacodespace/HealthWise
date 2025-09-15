@@ -8,39 +8,35 @@ body {
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 5% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 5% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 180 95% 55%;
-    --primary-foreground: 180 100% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 300 95% 65%;
-    --accent-foreground: 300 100% 10%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 172 80% 40%;
+    --primary-foreground: 172 100% 10%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 24 95% 55%;
+    --accent-foreground: 24 100% 10%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 180 95% 60%;
-    --chart-1: 180 90% 50%;
-    --chart-2: 300 85% 60%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 172 80% 45%;
+    --chart-1: 172 76% 42%;
+    --chart-2: 24 90% 58%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --radius: 1rem;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --health-ok: 140, 70%, 45%;
+    --health-caution: 40, 90%, 55%;
+    --health-alert: 0, 80%, 60%;
   }
 
   .dark {
@@ -50,32 +46,28 @@ body {
     --card-foreground: 0 0% 98%;
     --popover: 240 5% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 180 95% 55%;
-    --primary-foreground: 180 100% 10%;
+    --primary: 172 80% 45%;
+    --primary-foreground: 172 100% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 300 95% 65%;
-    --accent-foreground: 300 100% 10%;
+    --accent: 24 95% 60%;
+    --accent-foreground: 24 100% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 180 95% 60%;
-    --chart-1: 180 90% 50%;
-    --chart-2: 300 85% 60%;
+    --ring: 172 80% 50%;
+    --chart-1: 172 70% 45%;
+    --chart-2: 24 85% 60%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --health-ok: 140, 60%, 40%;
+    --health-caution: 40, 80%, 50%;
+    --health-alert: 0, 70%, 55%;
   }
 }
 
@@ -95,11 +87,28 @@ body {
   }
 
   .card-glow {
-    @apply shadow-[0_0_15px_hsl(var(--primary)/0.2),_0_0_30px_hsl(var(--accent)/0.2)];
-    transition: box-shadow 0.3s ease-in-out;
+    @apply shadow-none transition-all duration-300;
   }
   
   .card-glow:hover {
-     @apply shadow-[0_0_30px_hsl(var(--primary)/0.4),_0_0_60px_hsl(var(--accent)/0.3)];
+     @apply shadow-[0_0_20px_hsl(var(--primary)/0.2),_0_0_40px_hsl(var(--accent)/0.15)] -translate-y-1;
+  }
+
+  .flip-card {
+    perspective: 1000px;
+  }
+  .flip-card-inner {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .flip-card-back {
+    transform: rotateY(180deg);
   }
 }
