@@ -2,11 +2,12 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { z } from 'zod';
-import { useFormState } from 'react-dom';
 import { Loader2, LogIn } from 'lucide-react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import { loginUser } from '@/actions/auth';
 import { LoginSchema } from '@/lib/definitions';
@@ -29,9 +30,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { auth } from '@/lib/firebase';
+import { useAuth } from '@/context/AuthContext';
+
 
 function LoginForm() {
   const { toast } = useToast();
+  const router = useRouter();
+  const { user } = useAuth();
   const [pending, setPending] = React.useState(false);
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -42,24 +48,30 @@ function LoginForm() {
     },
   });
 
+  React.useEffect(() => {
+    if(user) {
+        router.push('/dashboard');
+    }
+  }, [user, router]);
+
+
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setPending(true);
-    const result = await loginUser(values);
-    setPending(false);
-
-    if (result.error) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: result.error,
-      });
-    } else if (result.success) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: 'Login Successful',
         description: 'Redirecting to your dashboard...',
       });
-      // In a real app, you would redirect here:
-      // router.push('/dashboard');
+      router.push('/dashboard');
+    } catch (error: any) {
+       toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: error.message || 'An unexpected error occurred.',
+      });
+    } finally {
+        setPending(false);
     }
   };
 

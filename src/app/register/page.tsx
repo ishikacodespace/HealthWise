@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { z } from 'zod';
 import { Loader2, UserPlus } from 'lucide-react';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 import { registerUser } from '@/actions/auth';
 import { RegisterSchema } from '@/lib/definitions';
@@ -28,10 +30,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { auth } from '@/lib/firebase';
+import { useAuth } from '@/context/AuthContext';
 
 
 function RegisterForm() {
   const { toast } = useToast();
+  const router = useRouter();
+  const { user } = useAuth();
   const [pending, setPending] = React.useState(false);
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -44,23 +50,33 @@ function RegisterForm() {
     },
   });
 
+  React.useEffect(() => {
+    if(user) {
+        router.push('/dashboard');
+    }
+  }, [user, router]);
+
+
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
     setPending(true);
-    const result = await registerUser(values);
-    setPending(false);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+        await updateProfile(userCredential.user, { displayName: values.name });
 
-    if (result.error) {
+        toast({
+            title: 'Registration Successful',
+            description: 'You can now log in with your new account.',
+        });
+        router.push('/login');
+
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Registration Failed',
-        description: result.error,
+        description: error.message || 'An unexpected error occurred.',
       });
-    } else if (result.success) {
-      toast({
-        title: 'Registration Successful',
-        description: 'You can now log in with your new account.',
-      });
-      form.reset();
+    } finally {
+        setPending(false);
     }
   };
 

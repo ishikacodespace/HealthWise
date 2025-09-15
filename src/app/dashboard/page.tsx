@@ -4,6 +4,7 @@ import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
+import { useRouter } from 'next/navigation';
 import {
   HeartPulse,
   Thermometer,
@@ -78,6 +79,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, query, where, getDocs, Timestamp, orderBy } from 'firebase/firestore';
+
 
 const chartConfig = {
   heartRate: {
@@ -107,21 +112,54 @@ const getStatusColor = (status: BpStatus | TempStatus | BmiStatus) => {
 }
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [healthData, setHealthData] = React.useState<HealthEntry[]>([]);
   const [personalizedTips, setPersonalizedTips] = React.useState<string[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isFetchingData, setIsFetchingData] = React.useState(true);
   const [quote, setQuote] = React.useState('');
   const { toast } = useToast();
 
   React.useEffect(() => {
-    // Pick a random quote on component mount
-    setQuote(wellnessQuotes[Math.floor(Math.random() * wellnessQuotes.length)]);
-    // Load data from localStorage
-    const savedData = localStorage.getItem('healthData');
-    if (savedData) {
-      setHealthData(JSON.parse(savedData));
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, []);
+
+    const fetchHealthData = async () => {
+        setIsFetchingData(true);
+        try {
+            const q = query(
+                collection(db, "healthEntries"), 
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "asc")
+            );
+            const querySnapshot = await getDocs(q);
+            const data: HealthEntry[] = querySnapshot.docs.map(doc => {
+                const docData = doc.data();
+                return {
+                    id: doc.id,
+                    ...docData,
+                    date: (docData.createdAt.toDate() as Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                } as HealthEntry;
+            });
+            setHealthData(data);
+        } catch (error) {
+            console.error("Error fetching health data: ", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Could not fetch your health data.",
+            });
+        } finally {
+            setIsFetchingData(false);
+        }
+    };
+
+    fetchHealthData();
+    setQuote(wellnessQuotes[Math.floor(Math.random() * wellnessQuotes.length)]);
+  }, [user, router, toast]);
 
   const form = useForm<z.infer<typeof HealthDataSchema>>({
     resolver: zodResolver(HealthDataSchema),
@@ -149,13 +187,17 @@ export default function DashboardPage() {
   }, [watchHeight, watchWeight, form]);
 
   async function onSubmit(values: z.infer<typeof HealthDataSchema>) {
+    if (!user) {
+        toast({ variant: "destructive", title: "Not authenticated"});
+        return;
+    }
     setIsLoading(true);
     setPersonalizedTips([]);
 
     const bmi = calculateBmi(Number(values.height), Number(values.weight));
 
-    const newEntry: HealthEntry = {
-      id: Date.now(),
+    const newEntryData = {
+      userId: user.uid,
       bloodPressure: values.bloodPressure,
       heartRate: Number(values.heartRate),
       bodyTemperature: Number(values.bodyTemperature),
@@ -163,41 +205,54 @@ export default function DashboardPage() {
       height: Number(values.height),
       weight: Number(values.weight),
       bmi: bmi,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    };
-
-    const updatedHealthData = [...healthData, newEntry];
-    setHealthData(updatedHealthData);
-    localStorage.setItem('healthData', JSON.stringify(updatedHealthData));
-
-
-    if (updatedHealthData.length > 0 && updatedHealthData.length % 3 === 0) {
-      toast({
-        title: 'Way to go! 🎉',
-        description: `You've logged your health ${updatedHealthData.length} times. Keep up the great work!`,
-      });
-    }
-
-    const aiInput: PersonalizedHealthTipsInput = {
-      bloodPressure: newEntry.bloodPressure,
-      heartRate: newEntry.heartRate,
-      bodyTemperature: newEntry.bodyTemperature,
-      bmi: newEntry.bmi,
+      createdAt: Timestamp.now(),
     };
 
     try {
-      const result = await getPersonalizedHealthTips(aiInput);
-      setPersonalizedTips(result.healthTips);
+        const docRef = await addDoc(collection(db, "healthEntries"), newEntryData);
+        const newEntry: HealthEntry = {
+            id: docRef.id,
+            ...newEntryData,
+            date: newEntryData.createdAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        };
+        const updatedHealthData = [...healthData, newEntry];
+        setHealthData(updatedHealthData);
+
+        if (updatedHealthData.length > 0 && updatedHealthData.length % 3 === 0) {
+            toast({
+                title: 'Way to go! 🎉',
+                description: `You've logged your health ${updatedHealthData.length} times. Keep up the great work!`,
+            });
+        }
+
+        const aiInput: PersonalizedHealthTipsInput = {
+            bloodPressure: newEntry.bloodPressure,
+            heartRate: newEntry.heartRate,
+            bodyTemperature: newEntry.bodyTemperature,
+            bmi: newEntry.bmi,
+        };
+
+        const result = await getPersonalizedHealthTips(aiInput);
+        setPersonalizedTips(result.healthTips);
+
     } catch (error) {
-      console.error('Error fetching health tips:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch personalized health tips.',
-      });
+        console.error('Error saving or analyzing data:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not save your data or fetch tips.',
+        });
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
+  }
+  
+  if (!user) {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <p>Redirecting to login...</p>
+        </div>
+    );
   }
 
   const latestEntry = healthData.length > 0 ? healthData[healthData.length - 1] : null;
@@ -206,7 +261,6 @@ export default function DashboardPage() {
   const bmiStatus = latestEntry ? getBmiStatus(latestEntry.bmi) : null;
   const healthScore = latestEntry && bpStatus && bmiStatus ? getHealthScore(bpStatus, bmiStatus, latestEntry.heartRate) : null;
 
-
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
       <div className="text-center max-w-3xl mx-auto mb-8">
@@ -214,7 +268,7 @@ export default function DashboardPage() {
           Your Health Dashboard
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          Enter your latest health metrics to track your progress and get personalized insights.
+          Welcome, {user.displayName || 'User'}! Enter your latest health metrics to track your progress.
         </p>
       </div>
       
@@ -404,7 +458,7 @@ export default function DashboardPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {healthScore !== null ? (
+                    {isFetchingData ? <Skeleton className="h-20 w-full" /> : healthScore !== null ? (
                         <div>
                             <div className='flex items-baseline gap-2'>
                                 <p className="text-4xl font-bold text-primary">{healthScore}</p>
@@ -458,7 +512,7 @@ export default function DashboardPage() {
                     <CardTitle className="font-headline flex items-center gap-2"><TrendingUp/>Health Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {healthData.length > 0 ? (
+                    {isFetchingData ? <Skeleton className="h-64 w-full" /> : healthData.length > 0 ? (
                         <Tabs defaultValue="chart">
                              <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="chart"><AreaChart className="mr-2 h-4 w-4" />Chart</TabsTrigger>
@@ -496,7 +550,7 @@ export default function DashboardPage() {
                                                 <TableCell>{entry.bloodPressure}</TableCell>
                                                 <TableCell>{entry.heartRate}</TableCell>
                                                 <TableCell>{entry.bloodSugar}</TableCell>
-                                                <TableCell>{entry.bmi}</TableCell>
+                                                <TableCell>{entry.bmi.toFixed(1)}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>

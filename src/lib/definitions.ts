@@ -37,7 +37,8 @@ export const HealthDataSchema = z.object({
 // =================================================================
 
 export type HealthEntry = {
-  id: number;
+  id: string; // Changed from number to string for Firestore doc ID
+  userId: string;
   date: string;
   bloodPressure: string;
   heartRate: number;
@@ -46,6 +47,7 @@ export type HealthEntry = {
   height: number;
   weight: number;
   bmi: number;
+  createdAt: { seconds: number, nanoseconds: number } | Date; // For Firestore Timestamp
 };
 
 export type BpStatus = 'Normal' | 'Elevated' | 'High' | 'Hypertensive Crisis' | 'Invalid';
