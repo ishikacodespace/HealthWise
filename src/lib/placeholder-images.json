@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A diverse group of people smiling and looking healthy.",
+      "imageUrl": "https://picsum.photos/seed/hero/1200/800",
+      "imageHint": "community health"
+    },
+    {
+      "id": "feature-data-input",
+      "description": "A person using a phone to input data.",
+      "imageUrl": "https://picsum.photos/seed/data-input/600/400",
+      "imageHint": "health tracking"
+    },
+    {
+      "id": "feature-visualization",
+      "description": "A screen showing health data charts and graphs.",
+      "imageUrl": "https://picsum.photos/seed/visualization/600/400",
+      "imageHint": "data chart"
+    },
+    {
+      "id": "feature-ai-tips",
+      "description": "An abstract image representing artificial intelligence.",
+      "imageUrl": "https://picsum.photos/seed/ai-tips/600/400",
+      "imageHint": "artificial intelligence"
+    },
+    {
+      "id": "awareness-diet",
+      "description": "A colorful plate of healthy food.",
+      "imageUrl": "https://picsum.photos/seed/diet/600/400",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "awareness-exercise",
+      "description": "A person jogging in a park at sunrise.",
+      "imageUrl": "https://picsum.photos/seed/exercise/600/400",
+      "imageHint": "person jogging"
+    },
+    {
+      "id": "awareness-mental-health",
+      "description": "A person meditating peacefully outdoors.",
+      "imageUrl": "https://picsum.photos/seed/mental-health/600/400",
+      "imageHint": "person meditating"
+    },
+    {
+      "id": "awareness-sleep",
+      "description": "A calm and comfortable bedroom setting.",
+      "imageUrl": "https://picsum.photos/seed/sleep/600/400",
+      "imageHint": "bedroom night"
+    }
+  ]
 }
