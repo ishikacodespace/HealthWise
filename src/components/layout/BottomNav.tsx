@@ -43,7 +43,6 @@ export default function BottomNav({ navLinks }: { navLinks: NavLink[] }) {
   };
   
   const mainNavLinks = navLinks.filter(link => link.href !== '/login');
-  const allLinks = user ? [...mainNavLinks, {href: '/logout', label: 'Logout'}] : [...mainNavLinks, {href: '/login', label: 'Login'}];
 
 
   return (
