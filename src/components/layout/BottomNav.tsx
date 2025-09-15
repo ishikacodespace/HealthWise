@@ -48,7 +48,7 @@ export default function BottomNav({ navLinks }: { navLinks: NavLink[] }) {
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t">
       <div className="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
-        {navLinks.map((link) => (
+        {mainNavLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}

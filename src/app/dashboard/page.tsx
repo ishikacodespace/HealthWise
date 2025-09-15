@@ -560,8 +560,7 @@ export default function DashboardPage() {
                     ) : (
                          <p className="text-muted-foreground text-center py-8">
                             Your health data log is empty. Submit your vitals to start tracking.
-                        </p>
-                    )}
+                        </p>                    )}
                 </CardContent>
             </Card>
         </div>
