@@ -87,6 +87,9 @@ export default function AwarenessPage() {
             <div className="flip-card-inner relative w-full h-full text-center">
               <div className="flip-card-front w-full h-full">
                  <Card className="flex flex-col h-full shadow-lg">
+                    <CardHeader className="flex-grow">
+                      <CardTitle className="font-headline">{topic.title}</CardTitle>
+                    </CardHeader>
                     {topic.image && (
                       <div className="relative aspect-video w-full">
                         <Image
@@ -98,9 +101,6 @@ export default function AwarenessPage() {
                         />
                       </div>
                     )}
-                    <CardHeader className="flex-grow">
-                      <CardTitle className="font-headline">{topic.title}</CardTitle>
-                    </CardHeader>
                   </Card>
               </div>
               <div className="flip-card-back w-full h-full absolute top-0 left-0">
