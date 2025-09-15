@@ -131,7 +131,8 @@ export default function DashboardPage() {
       heartRate: '70',
       bodyTemperature: '98.6',
       height: '175',
-      weight: '70'
+      weight: '70',
+      bmi: String(calculateBmi(175, 70)),
     },
   });
 
