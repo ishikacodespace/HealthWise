@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HeartPulse, Menu, Moon, Sun, X } from 'lucide-react';
+import { HeartPulse, Menu, Moon, Sun, X, Stethoscope } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import BottomNav from './BottomNav';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/symptom-checker', label: 'Symptom Checker' },
   { href: '/awareness', label: 'Awareness' },
 ];
 

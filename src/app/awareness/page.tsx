@@ -31,6 +31,24 @@ const awarenessTopics = [
   },
 ];
 
+const videoTopics = [
+    {
+        title: "Understanding Vaccines",
+        description: "An animated explainer on how vaccines work to protect you and your community.",
+        videoId: "o_XVt5rdpFY",
+    },
+    {
+        title: "5-Minute Mindfulness Meditation",
+        description: "A guided meditation session to help you reduce stress and find your center.",
+        videoId: "iN6g2mr0p3Q",
+    },
+    {
+        title: "Healthy Cooking for Beginners",
+        description: "Learn to cook a simple, nutritious, and delicious meal in under 15 minutes.",
+        videoId: "fJb_O_5Xv8o",
+    }
+]
+
 export default function AwarenessPage() {
   const topicsWithImages = awarenessTopics.map(topic => {
     const image = PlaceHolderImages.find(img => img.id === topic.imageId);
@@ -50,28 +68,27 @@ export default function AwarenessPage() {
 
       <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {topicsWithImages.map((topic) => (
-           <div key={topic.title} className="flip-card rounded-lg overflow-hidden">
+           <div key={topic.title} className="flip-card rounded-lg overflow-hidden h-[300px]">
             <div className="flip-card-inner relative w-full h-full text-center">
               <div className="flip-card-front w-full h-full">
                  <Card className="flex flex-col h-full shadow-lg">
                     {topic.image && (
-                      <div className="relative aspect-w-16 aspect-h-9 w-full">
+                      <div className="relative aspect-video w-full">
                         <Image
                           src={topic.image.imageUrl}
                           alt={topic.image.description}
-                          width={600}
-                          height={400}
-                          className="object-cover w-full h-full"
+                          fill
+                          className="object-cover"
                           data-ai-hint={topic.image.imageHint}
                         />
                       </div>
                     )}
-                    <CardHeader>
+                    <CardHeader className="flex-grow">
                       <CardTitle className="font-headline">{topic.title}</CardTitle>
                     </CardHeader>
                   </Card>
               </div>
-              <div className="flip-card-back w-full h-full">
+              <div className="flip-card-back w-full h-full absolute top-0 left-0">
                 <Card className="flex flex-col h-full bg-secondary shadow-lg">
                   <CardContent className="flex-grow flex items-center justify-center p-6">
                     <CardDescription className="text-secondary-foreground">{topic.description}</CardDescription>
@@ -81,6 +98,38 @@ export default function AwarenessPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-24">
+         <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold font-headline tracking-tight text-foreground sm:text-4xl">
+                Health in Motion
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+                Watch and learn with these short, informative videos.
+            </p>
+        </div>
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {videoTopics.map((video) => (
+                <Card key={video.title} className="overflow-hidden shadow-lg card-glow">
+                    <div className="aspect-video">
+                        <iframe
+                            className="w-full h-full"
+                            src={`https://www.youtube.com/embed/${video.videoId}`}
+                            title={video.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">{video.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <CardDescription>{video.description}</CardDescription>
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
       </div>
     </div>
   );

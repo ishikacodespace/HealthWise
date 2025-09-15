@@ -13,13 +13,12 @@ import {
   Loader2,
   List,
   AreaChart,
-  Flame,
-  Snowflake,
-  BadgeCent,
-  TrendingUp,
-  Award,
+  Droplets,
   Zap,
+  Award,
+  TrendingUp,
   Quote,
+  BadgeCent
 } from 'lucide-react';
 import {
   Area,
@@ -130,6 +129,7 @@ export default function DashboardPage() {
       bloodPressure: '120/80',
       heartRate: '70',
       bodyTemperature: '98.6',
+      bloodSugar: '90',
       height: '175',
       weight: '70',
       bmi: String(calculateBmi(175, 70)),
@@ -159,6 +159,7 @@ export default function DashboardPage() {
       bloodPressure: values.bloodPressure,
       heartRate: Number(values.heartRate),
       bodyTemperature: Number(values.bodyTemperature),
+      bloodSugar: Number(values.bloodSugar),
       height: Number(values.height),
       weight: Number(values.weight),
       bmi: bmi,
@@ -330,6 +331,19 @@ export default function DashboardPage() {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="bloodSugar"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center text-sm"><Droplets className="mr-2 h-4 w-4" />Blood Sugar (mg/dL)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="e.g., 90" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -471,7 +485,7 @@ export default function DashboardPage() {
                                             <TableHead>Date</TableHead>
                                             <TableHead>BP</TableHead>
                                             <TableHead>Heart Rate</TableHead>
-                                            <TableHead>Temp (°F)</TableHead>
+                                            <TableHead>Sugar</TableHead>
                                             <TableHead>BMI</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -481,7 +495,7 @@ export default function DashboardPage() {
                                                 <TableCell>{entry.date}</TableCell>
                                                 <TableCell>{entry.bloodPressure}</TableCell>
                                                 <TableCell>{entry.heartRate}</TableCell>
-                                                <TableCell>{entry.bodyTemperature}</TableCell>
+                                                <TableCell>{entry.bloodSugar}</TableCell>
                                                 <TableCell>{entry.bmi}</TableCell>
                                             </TableRow>
                                         ))}

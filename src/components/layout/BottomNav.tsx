@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, HeartPulse, Moon, Sun, User } from "lucide-react";
+import { Home, LayoutDashboard, HeartPulse, Moon, Sun, User, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ type NavLink = {
 const iconMap: { [key: string]: React.ReactNode } = {
   "/": <Home className="h-5 w-5" />,
   "/dashboard": <LayoutDashboard className="h-5 w-5" />,
+  "/symptom-checker": <Stethoscope className="h-5 w-5" />,
   "/awareness": <HeartPulse className="h-5 w-5" />,
   "/login": <User className="h-5 w-5" />,
 };
@@ -30,11 +31,13 @@ export default function BottomNav({ navLinks }: { navLinks: NavLink[] }) {
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+  
+  const mainNavLinks = navLinks.filter(link => link.href !== '/login');
 
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t">
       <div className="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
-        {navLinks.map((link) => (
+        {mainNavLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}

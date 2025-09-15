@@ -25,6 +25,7 @@ export const HealthDataSchema = z.object({
     bloodPressure: z.string().regex(/^\d{2,3}\/\d{2,3}$/, { message: "Invalid format. Use 'e.g. 120/80'"}),
     heartRate: z.string().min(1, { message: "Heart rate is required."}),
     bodyTemperature: z.string().min(1, { message: "Temperature is required."}),
+    bloodSugar: z.string().min(1, { message: "Blood sugar is required."}),
     height: z.string().min(1, { message: 'Height is required.' }),
     weight: z.string().min(1, { message: 'Weight is required.' }),
     bmi: z.string().optional(),
@@ -41,6 +42,7 @@ export type HealthEntry = {
   bloodPressure: string;
   heartRate: number;
   bodyTemperature: number;
+  bloodSugar: number;
   height: number;
   weight: number;
   bmi: number;
