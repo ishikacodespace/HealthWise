@@ -37,10 +37,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative w-full py-20 md:py-32 lg:py-40 bg-card">
+      <section className="relative w-full py-20 md:py-32 lg:py-40 bg-card bg-gradient-hero">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl font-headline font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-headline font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
               HealthWise Community
             </h1>
             <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-xl">
@@ -82,7 +82,7 @@ export default function Home() {
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
-              <Card key={feature.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <Card key={feature.title} className="flex flex-col overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl bg-card/50 backdrop-blur-sm">
                 {feature.image && (
                   <div className="aspect-w-3 aspect-h-2">
                      <Image
