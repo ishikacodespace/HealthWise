@@ -87,11 +87,11 @@ export default function AwarenessPage() {
             <div className="flip-card-inner relative w-full h-full text-center">
               <div className="flip-card-front w-full h-full">
                  <Card className="flex flex-col h-full shadow-lg">
-                    <CardHeader className="flex-grow-0">
+                    <CardHeader className="flex-shrink-0">
                       <CardTitle className="font-headline">{topic.title}</CardTitle>
                     </CardHeader>
                     {topic.image && (
-                      <CardContent className="flex-grow relative">
+                      <CardContent className="flex-grow relative p-0">
                         <Image
                           src={topic.image.imageUrl}
                           alt={topic.image.description}
