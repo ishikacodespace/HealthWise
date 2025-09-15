@@ -47,6 +47,18 @@
       "description": "A calm and comfortable bedroom setting.",
       "imageUrl": "https://picsum.photos/seed/sleep/600/400",
       "imageHint": "bedroom night"
+    },
+    {
+      "id": "awareness-hydration",
+      "description": "A glass of water with a lemon slice.",
+      "imageUrl": "https://picsum.photos/seed/hydration/600/400",
+      "imageHint": "glass water"
+    },
+    {
+      "id": "awareness-labels",
+      "description": "A person reading a food label on a product in a grocery store.",
+      "imageUrl": "https://picsum.photos/seed/labels/600/400",
+      "imageHint": "food label"
     }
   ]
 }

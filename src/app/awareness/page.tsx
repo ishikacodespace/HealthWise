@@ -29,6 +29,16 @@ const awarenessTopics = [
     description: 'Understand the sleep cycle and discover tips for improving your sleep hygiene. Quality sleep is crucial for physical recovery and cognitive function.',
     imageId: 'awareness-sleep',
   },
+  {
+    title: 'Hydration for Health',
+    description: 'Discover why water is essential for your body and get tips on how to stay properly hydrated throughout the day.',
+    imageId: 'awareness-hydration',
+  },
+  {
+    title: 'Decoding Food Labels',
+    description: 'Learn how to read and understand food labels to make healthier choices at the grocery store.',
+    imageId: 'awareness-labels',
+  }
 ];
 
 const videoTopics = [
@@ -40,12 +50,17 @@ const videoTopics = [
     {
         title: "5-Minute Mindfulness Meditation",
         description: "A guided meditation session to help you reduce stress and find your center.",
-        videoId: "iN6g2mr0p3Q",
+        videoId: "inpok4MKVLM",
     },
     {
         title: "Healthy Cooking for Beginners",
         description: "Learn to cook a simple, nutritious, and delicious meal in under 15 minutes.",
         videoId: "fJb_O_5Xv8o",
+    },
+    {
+        title: "The Benefits of a Morning Walk",
+        description: "Explore the physical and mental health benefits of starting your day with a walk.",
+        videoId: "y_p_0_ML-sQ",
     }
 ]
 
@@ -66,7 +81,7 @@ export default function AwarenessPage() {
         </p>
       </div>
 
-      <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {topicsWithImages.map((topic) => (
            <div key={topic.title} className="flip-card rounded-lg overflow-hidden h-[300px]">
             <div className="flip-card-inner relative w-full h-full text-center">
