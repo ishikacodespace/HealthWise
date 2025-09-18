@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -54,10 +55,14 @@ export default function SymptomCheckerPage() {
       setAnalysis(result);
     } catch (error) {
       console.error('Error fetching symptom analysis:', error);
+      let description = 'Could not fetch symptom analysis.';
+      if (error instanceof Error && error.message.includes('503')) {
+        description = 'The AI service is currently overloaded. Please try again in a few moments.';
+      }
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch symptom analysis.',
+        title: 'Analysis Error',
+        description: description,
       });
     } finally {
       setIsLoading(false);
