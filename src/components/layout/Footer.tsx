@@ -31,7 +31,6 @@ export default function Footer() {
              <h4 className="font-semibold mb-4 font-headline text-foreground">Contact Us</h4>
              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>agrishikaa@gmail.com</li>
-                <li>123 Health St, Wellness City</li>
              </ul>
           </div>
           <div>
