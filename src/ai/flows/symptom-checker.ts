@@ -8,8 +8,11 @@
  * - `SymptomCheckerOutput` - The return type for the getSymptomAnalysis function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+
+// Log the env variable at the very top (startup)
+console.log("GOOGLE_GENERATIVEAI_API_KEY AT IMPORT:", process.env.GOOGLE_GENERATIVEAI_API_KEY);
 
 const SymptomCheckerInputSchema = z.object({
   symptoms: z
@@ -22,8 +25,8 @@ const SymptomCheckerOutputSchema = z.object({
   possibleCauses: z
     .array(z.string())
     .describe('A list of possible, non-emergency medical causes for the described symptoms.'),
-  recommendedActions: z.
-    array(z.string())
+  recommendedActions: z
+    .array(z.string())
     .describe('A list of recommended actions for the user to take, such as resting, hydrating, or when to see a doctor.'),
 });
 export type SymptomCheckerOutput = z.infer<typeof SymptomCheckerOutputSchema>;
@@ -31,13 +34,22 @@ export type SymptomCheckerOutput = z.infer<typeof SymptomCheckerOutputSchema>;
 export async function getSymptomAnalysis(
   input: SymptomCheckerInput
 ): Promise<SymptomCheckerOutput> {
-  return symptomCheckerFlow(input);
+  // Log the env variable at runtime (each request)
+  console.log("GOOGLE_GENERATIVEAI_API_KEY AT RUNTIME:", process.env.GOOGLE_GENERATIVEAI_API_KEY);
+
+  try {
+    return await symptomCheckerFlow(input);
+  } catch (error) {
+    // Log any AI call errors
+    console.error("Gemini call error:", error);
+    throw error;
+  }
 }
 
 const symptomCheckerPrompt = ai.definePrompt({
   name: 'symptomCheckerPrompt',
-  input: {schema: SymptomCheckerInputSchema},
-  output: {schema: SymptomCheckerOutputSchema},
+  input: { schema: SymptomCheckerInputSchema },
+  output: { schema: SymptomCheckerOutputSchema },
   prompt: `You are a helpful AI medical assistant. A user has provided the following symptoms:
 
 Symptoms: {{{symptoms}}}
@@ -56,7 +68,7 @@ const symptomCheckerFlow = ai.defineFlow(
     outputSchema: SymptomCheckerOutputSchema,
   },
   async input => {
-    const {output} = await symptomCheckerPrompt(input);
+    const { output } = await symptomCheckerPrompt(input);
     return output!;
   }
 );
